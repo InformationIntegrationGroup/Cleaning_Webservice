@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3 Demo</title>
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */
+				.axis path,
+				.axis line {
+				    fill: none;
+				    stroke: black;
+				    stroke-width: 4
+				    shape-rendering: crispEdges;
+				}
+				
+				.axis text {
+				    font-family: sans-serif;
+				    font-size: 11px;
+				}
+				.x.axis path {
+				  display: none;
+				}		
+		</style>
+	</head>
+	<body>
+	Chart should appear below <br><br>		
+		<div></div>
+		<script type="text/javascript">
+
+		var margin = {top: 10, right: 10, bottom: 20, left: 10},
+    width = 700 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
+	
+	
+	var barPadding = 5;
+	var yaxispadding = 30;
+	var xPadding = 30;
+	var yPadding = 2;
+	
+	w = width;
+	h = height;
+	
+	var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+					11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
+	
+	/* var year1 = ["Year:2012=2:18, 28", "Year:2009=4:2, 9, 16, 26", "Year:2011=3:4, 11, 21", "Year:2008=3:8, 15, 25", "Year:2010=4:10, 17, 20, 27", "Year:2007=3:7, 14, 24",
+	            "INVALID=2:1, 3", "Year:2017=1:0", "Year:2014=3:6, 13, 23", "Year:2013=5:5, 12, 19, 22, 29"
+	            ]; */
+	var year = [['2014','3:6, 13, 23'], ['2013','5:5, 12, 19, 22, 29'], ['2012','1:18'], 
+	            ['2009','4:2, 9, 16, 26'], ['2011','3:4, 11, 21'], ['2008','3:8, 15, 25'], 
+	            ['2010','4:10, 17, 20, 27'], ['INVALID','2:1, 3'], ['2007','3:7, 14, 24'], 
+	            ['MISSING','1:28'], ['2017','1:0']];
+	var Subcategory = "Year";
+	var numbers = [['122','2:22, 23'], ['120','3:20, 21'], ['118','4:18, 19'], ['116','1:16'], ['INVALID','6:15'],
+	               //['114','1:14'], ['112','7:12, 13'], ['108','2:8, 9'], ['110','5:10, 11'], ['106','6:6, 7'],
+	               ['104','2:4, 5'], ['102','2:2, 3'], ['MISSING','1:17'], ['128','2:28, 29'], ['100','7:0, 1'],
+	               ['126','3:26, 27'], ['124','4:24, 25']];
+			
+	var dataArray ;//= numbers;
+	dataArray = year;
+	
+			var counters = [];
+			for (i=0; i<dataArray.length; i++)
+			{
+				count = dataArray[i][1].split(":");
+				num = parseInt(count[0], 10);
+				counters.push(num);
+			}
+			
+			// Scale : X axis
+			
+			var xScale = d3.scale.ordinal()
+    					.rangeRoundBands([0, w], .1);
+			
+			
+			// Scale : Y axis
+			var yScale = d3.scale.linear()
+                   			.domain([0, d3.max(counters, function(d) { return d; })])
+                   			.range([ yPadding, h-yPadding ]);
+			
+			var yScaleinverted = d3.scale.linear()
+        						    .domain([0, d3.max(counters, function(d) { return d; })])
+            						.range([ h, 0]);
+			
+			// Define Y axis
+		var yAxis = d3.svg.axis()
+         			  .scale(yScaleinverted)
+            		  .orient("left")
+            		//.ticks(5)
+            		;
+			
+		// Define X axis
+		var xAxis = d3.svg.axis()
+				    .scale(xScale)
+				    .orient("bottom");
+			
+			//Create SVG element
+			var svg = d3.select("body")
+						.select("div")
+						.append("svg")
+						.attr("width", w  + margin.left + margin.right)
+						.attr("height", h + margin.top + margin.bottom)
+					.append("g")
+    					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			
+			
+			// Bars
+		svg.selectAll("rect")
+			.data(counters)
+			.enter()
+			.append("rect")
+			.attr("x", function(d, i) {
+						return i * ((w-xPadding) / counters.length) + xPadding;
+					})
+			.attr("y", function(d, i) {
+						//console.log("index: "+ i+ " value:" +d + " y value:"+ (h - yScale(d)));
+								return h - yScale(d);
+							})
+			.attr("width", w / counters.length - barPadding)
+			.attr("height",	function(d, i) {
+				//console.log("index: "+ i+ " yscale:" + yScale(d));
+						return yScale(d);
+					})
+			.attr("fill", function(d) {
+				return "steelblue";
+			});
+
+			
+			/* svg.selectAll("text")
+			   .data(numbers)
+			   .enter()
+			   .append("text")
+			   .text(function(d) {
+			   		return d;
+			   })
+			   .attr("text-anchor", "middle")
+			   .attr("x", function(d, i) {
+			   		return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
+			   })
+			   .attr("y", function(d) {
+			   		return h - (d * 4) + 14;
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "white");
+
+ */			
+			
+			//Text
+			svg.selectAll("text")
+			.data(dataArray)
+			.enter()
+			.append("text")
+			.text(function(d) {
+						return d[0];
+					})
+			.attr("text-anchor", "middle")
+			.attr("x", function(d, i) {
+						return i * ((w-xPadding) / counters.length)
+								+ ((w-xPadding) / counters.length - barPadding) / 2 + xPadding;
+					})
+			.attr("y", function(d) {
+					return h + margin.top +1 ;
+			})
+			.attr("font-family", "sans-serif")
+			.attr("font-size", "11px")
+			.attr("fill", "black");
+	
+ 
+ /*
+ // bar text
+ 			svg.selectAll("text")
+					.data(numbers)
+					.enter()	
+					.append("text")
+			   		.text("sdfsdfsdfsdfsd");
+ 					
+			    .attr("text-anchor", "middle")
+			   .attr("x", function(d, i) {
+				   return i * ((w-xPadding) / counters.length)
+					+ ((w-xPadding) / counters.length - barPadding) / 2 + xPadding;
+			   })
+			   .attr("y", function(d) {
+			   		return h - 50;
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "red");
+ */
+			
+			//Create Y axis
+			svg.append("g")
+			    .attr("class", "axis")
+			    .attr("transform", "translate(" + (yaxispadding) + ",0)")
+			    .call(yAxis)
+		    .append("text")
+		        .attr("transform", "rotate(-90)")
+		        .attr("y", 6)
+		        .attr("dy", ".71em")
+		        .style("text-anchor", "end")
+		        .text("Count");;
+		
+			//Create X axis
+			svg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(" + xPadding +"," + (h) + ")")
+				.call(xAxis)
+			.append("text")
+			      .attr("transform", "rotate(0)")
+			      .attr("x", w- xPadding+ 2)
+			      .attr("dx", ".71em")
+			      .attr("y", 13)
+			      .style("text-anchor", "end") 
+			      .text(Subcategory);;
+						
+		</script>
+		
+	</body>
+</html>

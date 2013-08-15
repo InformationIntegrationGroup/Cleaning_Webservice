@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>DR Home page</title>
+<style type="text/css">
+		.axis path,.axis line {
+			fill: none;
+			stroke: black;
+			stroke-width: 4 shape-rendering:  crispEdges;
+		}
+		
+		.axis text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+		
+		.x.axis path {
+			display: none;
+		}
+</style>
+<!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
+<script type="text/javascript" src="d3.v2.min.js"></script>
+<script language="javascript">
+	var jsonOutput = "No Data";
+	function validateForm() 
+	{
+		var x = document.getElementsByName("file")[0].value;
+		var y = document.getElementsByName("json")[0].value;
+		if ((x == null || x == "") && (y == null || y == "")) {
+			alert("Please enter values in the text boxes");
+			document.getElementsByName("fileLoc")[0].focus();
+			return false;
+		}
+		return true;
+	}
+	function Ajax() 
+	{
+		if (validateForm() == false)
+		{
+			return;
+		}
+		req = false;
+		document.getElementById('msg').innerHTML="";
+		if(window.XMLHttpRequest)
+		{
+			try
+			{
+				req = new XMLHttpRequest();
+			}
+			catch(e)
+			{
+				req = false;
+			}
+		}
+		if(req)
+		{
+			var type = document.getElementsByName("type")[0].value;
+			if(type == 'file')
+			{
+				var fileLoc = encodeURIComponent(document.getElementsByName("file")[0].value);
+				url = "http://localhost:8070/myWS/IdentifyData?" +type + "=" + fileLoc;
+			}
+			else 
+			{
+				var jsonString = encodeURIComponent(document.getElementsByName("json")[0].value);
+				url = "http://localhost:8070/myWS/IdentifyData?" +type + "=" + jsonString;
+			}
+			req.onreadystatechange = processReqChange;
+			req.open("GET", url, true);
+			req.setRequestHeader("Method", "GET " + url + "HTTP/1.1");
+			req.send("");
+		}
+	}
+
+	function processReqChange()
+	{
+		if (req.readyState == 4)
+		{
+			if (req.status == 200)
+			{
+				var outMsg = (req.responseXML && req.responseXML.contentType=="text/text") ?
+				req.responseXML.getElementsByTagName("choices")[0].textContent : req.responseText;
+				
+				if (outMsg.indexOf('No ')!=-1)
+				{
+					document.getElementById("updateArea").innerHTML = outMsg;
+					document.getElementById("Results").innerHTML ="";
+					return;
+				}
+				if (outMsg.indexOf('Exception')!=-1)
+				{
+					document.getElementById("updateArea").innerHTML = outMsg;
+					document.getElementById("Results").innerHTML ="";
+					return;
+				}
+				
+				jsonOutput = eval('(' + outMsg + ')');
+				document.getElementById("myHistogram").innerHTML = outMsg;
+				deletesvg = document.getElementsByTagName("svg");
+				/* if (deletesvg[0] !=null)
+					//document.removeChild(deletesvg[0]);
+					deletesvg[0].innerHTML = ""; */
+				drawChart();
+			}
+		}
+	}
+</script>
+</head>
+<body>
+	<h1 align="center">
+		<font color='blue'>Data Type Identification and D3 Chart</font>
+	</h1>
+	<table align="center" cellpadding="15" border='2'>
+		<tr>
+			<td><p></p> JSON File Location:
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" size="30"
+				name="file" value="D:\Study\DR\Strings.json" /> <br> OR <br>
+				JSON String: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;<input
+				type="text" size="30" height="100" name="json" value=""> <br>
+				<br>Type:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp; <select name="type" id="myselect">
+					<option value="file" selected>JSON File</option>
+					<option value="json">JSON String</option>
+			</select> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="button"
+				value="Invoke WebService" onclick="Ajax()" />
+				<p></p></td>
+		</tr>
+	</table>
+	<p align="center" id='msg' style="color: green; font: bold"></p>
+	<p align="center"> Chart should appear below </p><br>
+	<div></div> 
+	<div id=myHistogram align="center"></div>
+	<script type="text/javascript">
+	function drawChart()
+	{
+		var margin = {top: 10, right: 20, bottom: 35, left: 10},
+	    width = 500 - margin.left - margin.right,
+	    height = 300 - margin.top - margin.bottom;
+	
+		var barPadding = 5;
+		var yaxispadding = 30;
+		var xPadding = 30;
+		var yPadding = 2;
+		
+		w = width;
+		h = height;
+			
+	var dataArray = eval(jsonOutput.histogram);
+	console.log (dataArray);
+	var xLabel = jsonOutput.xLabel;
+	var yLabel = jsonOutput.yLabel;
+	var containsInvalid = (dataArray[dataArray.length-1].Value.toUpperCase() == "INVALID".toUpperCase());
+	var containsMissing = (dataArray[dataArray.length-2].Value.toUpperCase() == "MISSING".toUpperCase()) 
+							||(dataArray[dataArray.length-1].Value.toUpperCase() == "MISSING".toUpperCase());
+	
+		var counters = [];
+		
+		for (i=0; i<dataArray.length; i++)
+		{
+			//count = dataArray[i].Frequency.split(":");
+			//num = parseInt(count[0], 10);
+			num = parseInt(dataArray[i].Frequency, 10);
+			counters.push(num);
+		}
+		
+		// Scale : X axis
+		var xScale = d3.scale.ordinal()
+   					.rangeRoundBands([0, w], .1);
+		
+		// Scale : Y axis
+		var yScale = d3.scale.linear()
+                  			.domain([0, d3.max(counters, function(d) { return d; })])
+                  			.range([ yPadding, h-yPadding ]);
+		
+		var yScaleinverted = d3.scale.linear()
+       						    .domain([0, d3.max(counters, function(d) { return d; })])
+           						.range([ h, 0]);
+		
+		var formatPercent = d3.format("d");
+		// Define Y axis
+	var yAxis = d3.svg.axis()
+        		  .scale(yScaleinverted)
+           		  .orient("left")
+           		  .tickFormat(formatPercent);
+		
+		// Define X axis
+		var xAxis = d3.svg.axis()
+				    .scale(xScale)
+				    .orient("bottom");
+			
+			//Create SVG element
+			var svg = d3.select("body")
+						.select("div")
+						.append("svg")
+						.attr("width", w  + margin.left + margin.right)
+						.attr("height", h + margin.top + margin.bottom)
+					.append("g")
+    					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			// Bars
+		svg.selectAll("rect")
+			.data(counters)
+			.enter()
+			.append("rect")
+			.attr("x", function(d, i) {
+						return i * ((w-xPadding) / counters.length) + xPadding;
+					})
+			.attr("y", function(d, i) {
+								return h - yScale(d);
+							})
+			.attr("width", (w-xPadding) / counters.length - barPadding)
+			.attr("height",	function(d, i) {
+						return yScale(d);
+					})
+			.attr("fill", function(d, i) {
+				if (i == counters.length -1 && containsInvalid)
+					return "orangered";
+				if ((i == counters.length -2  && containsMissing && containsInvalid) || ( i == counters.length -1 && containsMissing))
+					return "Gray";
+				return "slateblue";
+			});
+						
+			//Text
+			svg.selectAll("text")
+			.data(dataArray)
+			.enter()
+			.append("text")
+			.text(function(d) {
+						return d[0];
+					})
+			.attr("text-anchor", "middle")
+			.attr("x", function(d, i) {
+						return i * ((w-xPadding) / counters.length)
+								+ ((w-xPadding) / counters.length - barPadding) / 2 + xPadding;
+					})
+			.attr("y", function(d) {
+					return h + margin.top +1 ;
+			})
+			.attr("font-family", "sans-serif")
+			.attr("font-size", "11px")
+			.attr("fill", "black");
+ 			
+			//Create Y axis
+			svg.append("g")
+			    .attr("class", "axis")
+			    .attr("transform", "translate(" + (yaxispadding) + ",0)")
+			    .call(yAxis)
+		    .append("text")
+		        .attr("transform", "rotate(-90)")
+		        .attr("y", 6)
+		        .attr("dy", ".71em")
+		        .attr("x", 10)
+		        .style("text-anchor", "end")
+		        .style("font-size","13")
+		        .text(yLabel);
+		
+			//Create X axis
+			svg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(" + xPadding +"," + (h) + ")")
+				.call(xAxis)
+			.append("text")
+			      .attr("transform", "rotate(0)")
+			      .attr("x", w- xPadding+ 2)
+			      .attr("dx", ".71em")
+			      .attr("y", 23)
+			      .style("text-anchor", "end")
+			      .style("font-size","13")
+			      .text(xLabel);
+	}
+		</script>
+		
+	
+	
+</body>
+</html>
