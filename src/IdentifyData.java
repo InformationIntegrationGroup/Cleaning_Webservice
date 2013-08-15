@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,13 +26,12 @@ import org.json.JSONObject;
 
 public class IdentifyData extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	public static final int TOTAL_DATATYPES = 7;
 	public static final int MAX_COLUMNS = 10;
 	private int[] counters;
 	private String[] ids;
 	int sampleRate = 1;
 	int sampleSize = -1;
-	//public static String DATE_FORMAT = "dd-MMM-yy";  //ex: "11-June-07"
+	// TO SUPPORT NEW DATE FORMAT, ADD THE PATTERN STRING IN FOLLOWING ARRAY
 	public static final String []DATE_FORMAT_ARRAY = {"dd-MMM-yy", "yyyy.MM.dd G 'at' HH:mm:ss z", "EEE, MMM d, ''yy", "h:mm a", "hh 'o''clock' a, zzzz",
 		"K:mm a, z", "yyyyy.MMMMM.dd GGG hh:mm aaa", "EEE, d MMM yyyy HH:mm:ss Z", "dd.MM.yy",
 		"yyyy.MM.dd G 'at' hh:mm:ss z", "EEE d MMM yy", "yyyy-mm-dd", "yyyy/mm/dd", "yyyy-MM-dd HH:mm:ss,z", 
@@ -58,7 +56,8 @@ public class IdentifyData extends HttpServlet {
 		Frequency,
 		IDs
 	};
-
+	
+	public static final int TOTAL_DATATYPES = 7;
 	enum dataType
 	{ 
 		Boolean,
@@ -70,7 +69,6 @@ public class IdentifyData extends HttpServlet {
 		Empty_String
 	}
 
-	/*Mean*/
 	private static double mean(int[] m) {
 		double sum = 0;
 		for (int i = 0; i < m.length; i++) {
@@ -91,7 +89,6 @@ public class IdentifyData extends HttpServlet {
 		stat[1] = m[(int) (PERCENTILE * m.length)];
 	}
 
-	/*MODE*/
 	private static int mode(int m[]) {  
 		int maxValue = m[0], maxCount = 0;
 
@@ -110,23 +107,19 @@ public class IdentifyData extends HttpServlet {
 
 	private int findMin(int[] m) {
 		Arrays.sort(m);
-
 		return m[0];
 	}
 
 	private int findMax(int[] m) {
 		Arrays.sort(m);
-
 		return m[m.length-1];
 	}
 
 	@SuppressWarnings("deprecation")
 	private void calFrequency(JSONObject jsonObject, int isValid, String datatype) throws JSONException, ParseException{  
-
 		String currentId = jsonObject.getString("id");
 		String str = null ;
 		if (1 == isValid) {
-
 			if (datatype == "DayOfWeek" || datatype == "Boolean") { 
 				str = jsonObject.getString("value").toLowerCase();
 				String firstChar = str.substring(0, 1).toUpperCase();
@@ -370,30 +363,25 @@ public class IdentifyData extends HttpServlet {
 			outputJsonArr = new JSONArray();
 			while (it.hasNext()) {
 				entry = it.next();
-				//output += "[\"" + entry.getKey().toString().replace("\"", "") + "\",\"" + entry.getValue().toString().replace("\"", "") + "\"]" + ", ";
 
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put(jsonkeys.Value.name(), entry.getKey().toString());
-				// to break to frequency and IDs
 				String [] freq_and_Ids = entry.getValue().toString().split(":");
-				//jsonObject.put(jsonkeys.Frequency.name(), entry.getValue().toString());
 				jsonObject.put(jsonkeys.Frequency.name(), freq_and_Ids.length>0? freq_and_Ids[0]:"");
 				jsonObject.put(jsonkeys.IDs.name(), freq_and_Ids.length>1? freq_and_Ids[1]:"");
 				outputJsonArr.put(jsonObject);
 			}
-			//output = removeTrailingCommas(output) + "]";
 			output = outputJsonArr.toString(); 
 		} 
-		catch(Exception e) {}
+		catch(Exception e) {
+			return "[]";
+		}
 		return output;
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
 
 		try{
-			/*System.out.println(new SimpleDateFormat(
-	              "EEE MMM dd yyyy HH:mm:ss zZ (zzzz)").format(new Date()));*/
-
 			initilizeData();
 			PrintWriter out = response.getWriter(); 
 			@SuppressWarnings("unchecked")
@@ -430,7 +418,6 @@ public class IdentifyData extends HttpServlet {
 				out.println("Malformed JSON");
 				return;
 			}
-
 
 			//sampling start
 			int maxSampleSize = 0;
@@ -530,7 +517,6 @@ public class IdentifyData extends HttpServlet {
 			{
 				overallRange = ( maxIntValue - minIntValue);  
 				colWidth =  (long) Math.ceil((float)overallRange /  Math.min( MAX_COLUMNS, id_list.length));
-				//colWidth = overallRange /  Math.min( MAX_COLUMNS, id_list.length);
 				if (colWidth == 0)
 					colWidth = 1;
 				outputJSON.put("histogram_Colwidth", colWidth+"");
@@ -593,7 +579,6 @@ public class IdentifyData extends HttpServlet {
 				outputJSON.put("Preferred_Length", stat[0]);
 				outputJSON.put("Max_Token_Length", stat[1]);
 			}
-
 
 			// To fill empty spaces in histogram
 			if (dataType.values()[maxCounterIndex].toString() == "Integer")
@@ -690,7 +675,6 @@ public class IdentifyData extends HttpServlet {
 	private void initilizeData() {
 		initilizeflag = 0;
 		histogramData.clear();
-
 	}
 
 	private String removeTrailingCommas(String inputString) {
@@ -698,11 +682,9 @@ public class IdentifyData extends HttpServlet {
 		if (inputString == null || inputString == "" || inputString.length() <0)
 			return inputString;
 
-
 		int lastComma = inputString.lastIndexOf(",");
 		inputString = inputString.substring(0, lastComma);
 		return inputString;
-
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
