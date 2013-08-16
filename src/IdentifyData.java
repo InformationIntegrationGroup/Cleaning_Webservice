@@ -61,9 +61,9 @@ public class IdentifyData extends HttpServlet {
 	enum dataType
 	{ 
 		Boolean,
+		Date,
 		Integer,
 		Double,
-		Date,
 		DayOfWeek,
 		String,
 		Empty_String
@@ -608,7 +608,7 @@ public class IdentifyData extends HttpServlet {
 					if (id_list[i]!= "" )
 						calFrequency(getJSONObjectbyID(jArray,id_list[i]), 2, dataType.values()[maxCounterIndex].toString());
 				}
-			} 
+			}	
 			outputJSON.put("histogram", printHistogram(dataType.values()[maxCounterIndex].toString()));
 
 			if (dataType.values()[maxCounterIndex].toString().compareTo("Date") == 0)
