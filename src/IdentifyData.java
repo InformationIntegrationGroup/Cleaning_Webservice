@@ -384,13 +384,15 @@ public class IdentifyData extends HttpServlet {
 		try{
 			initilizeData();
 			PrintWriter out = response.getWriter(); 
-			@SuppressWarnings("unchecked")
-			Map<String, String> requestMap = request.getParameterMap();
+			//@SuppressWarnings("unchecked")
+			//Map<String, String> requestMap = request.getParameterMap();
 			String jsonString="", filePath="" ;
-			if(requestMap.containsKey("json")) { 
+			String reqFileJSON = request.getParameter("file");
+			String reqStringJSON  = request.getParameter("json");
+			if(reqStringJSON != null) {
 				jsonString = request.getParameter("json");
 			}
-			else if (requestMap.containsKey("file" )) {
+			else if (reqFileJSON !=null) {
 				filePath = request.getParameter("file");
 
 				FileReader rd = new FileReader(filePath);
@@ -422,7 +424,7 @@ public class IdentifyData extends HttpServlet {
 			//sampling start
 			int maxSampleSize = 0;
 			int sampleStart = 0;
-			if(requestMap.containsKey("sampleRate") && requestMap.containsKey("sampleSize")) {
+			if(request.getParameter("sampleRate") != null && request.getParameter("sampleSize") != null) {
 				sampleRate = Integer.parseInt(request.getParameter("sampleRate"));
 				sampleSize = Integer.parseInt(request.getParameter("sampleSize"));
 			}
@@ -711,45 +713,6 @@ public class IdentifyData extends HttpServlet {
 		catch(Exception e){
 			e.printStackTrace();
 		}
-
-		// Integer Parsing
-		try{
-			int intValue = Integer.parseInt(str);
-
-			if (initilizeflag==0) {	maxIntValue = minIntValue = intValue;			initilizeflag =1;} 
-			if (intValue > maxIntValue)
-				maxIntValue = intValue;
-			if (intValue < minIntValue)
-				minIntValue = intValue;
-
-			counters[1]++;
-			if(ids[1] != null)
-				ids[1] += currentId + ", ";
-			else 
-				ids[1] = currentId + ", ";
-			return;
-		}
-		catch(Exception e){} 
-
-		// Double Parsing
-		try{
-
-			double doubleValue = Double.parseDouble(str);
-			if (initilizeflag==0) {	maxDoubleValue = minDoubleValue = doubleValue;			initilizeflag =1;}
-			if (doubleValue > maxDoubleValue)
-				maxDoubleValue= doubleValue;
-			if (doubleValue < minDoubleValue)
-				minDoubleValue = doubleValue;
-
-			counters[2]++;
-			if(ids[2] !=null)
-				ids[2] += currentId + ", ";
-			else 
-				ids[2] = currentId + ", ";
-			return;
-		}
-		catch(Exception e){}
-
 		// Date Parsing with DATE_FORMAT_ARRAY
 		try{
 			Date dateValue = null ;
@@ -773,6 +736,44 @@ public class IdentifyData extends HttpServlet {
 			if (dateValue.before(minDateValue))
 				minDateValue = dateValue;
 
+			counters[1]++;
+			if(ids[1] !=null)
+				ids[1] += currentId + ", ";
+			else 
+				ids[1] = currentId + ", ";
+			return;
+		}
+		catch(Exception e){}
+
+		// Integer Parsing
+		try{
+			int intValue = Integer.parseInt(str);
+
+			if (initilizeflag==0) {	maxIntValue = minIntValue = intValue;			initilizeflag =1;} 
+			if (intValue > maxIntValue)
+				maxIntValue = intValue;
+			if (intValue < minIntValue)
+				minIntValue = intValue;
+
+			counters[2]++;
+			if(ids[2] != null)
+				ids[2] += currentId + ", ";
+			else 
+				ids[2] = currentId + ", ";
+			return;
+		}
+		catch(Exception e){} 
+
+		// Double Parsing
+		try{
+
+			double doubleValue = Double.parseDouble(str);
+			if (initilizeflag==0) {	maxDoubleValue = minDoubleValue = doubleValue;			initilizeflag =1;}
+			if (doubleValue > maxDoubleValue)
+				maxDoubleValue= doubleValue;
+			if (doubleValue < minDoubleValue)
+				minDoubleValue = doubleValue;
+
 			counters[3]++;
 			if(ids[3] !=null)
 				ids[3] += currentId + ", ";
@@ -781,6 +782,8 @@ public class IdentifyData extends HttpServlet {
 			return;
 		}
 		catch(Exception e){}
+
+
 
 		// Parsing Days of the week
 		try{
