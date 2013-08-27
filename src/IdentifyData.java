@@ -387,6 +387,10 @@ public class IdentifyData extends HttpServlet {
 			//@SuppressWarnings("unchecked")
 			//Map<String, String> requestMap = request.getParameterMap();
 			String jsonString="", filePath="" ;
+			//System.out.println(request.toString());
+			/*System.out.println("Content length:" + request.getContentLength());
+			System.out.println("Content query:" + request.getQueryString());
+			System.out.println("Content type:" + request.getContentType());*/
 			String reqFileJSON = request.getParameter("file");
 			String reqStringJSON  = request.getParameter("json");
 			if(reqStringJSON != null) {
@@ -726,6 +730,7 @@ public class IdentifyData extends HttpServlet {
 				}
 				catch(Exception e){}
 			}
+			if (isDateValid==0) throw new Exception();
 			if (initilizeflag ==0) 
 			{
 				maxDateValue = minDateValue = dateValue; 
