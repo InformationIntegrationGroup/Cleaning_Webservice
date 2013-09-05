@@ -249,7 +249,7 @@ public class IdentifyData extends HttpServlet {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private String printHistogram(final String datatype) {
+	private String printHistogram(final String datatype) throws Exception{
 
 		String output = "[]" ;
 		Iterator<Entry<String, Values>>  it;
@@ -305,11 +305,18 @@ public class IdentifyData extends HttpServlet {
 		}
 
 		Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
+			@SuppressWarnings("deprecation")
 			public int compare(Entry<String, Values> first, Entry<String, Values> second) {
-				if (datatype == "Integer" || datatype == "Date") {
+				if (datatype == "Integer" ) {
 					int firstnum = Integer.parseInt(first.getKey());
 					int secnum = Integer.parseInt(second.getKey());
 					return  firstnum - secnum;
+				}
+				if (datatype == "Date") {
+					long firstnum = Date.parse(first.getKey());
+					long secnum = Date.parse(second.getKey());
+					if(firstnum > secnum) return 1;
+					else return -1;
 				}
 				if (datatype == "Double" ) {
 					double firstnum = Double.parseDouble(first.getKey());
@@ -384,13 +391,7 @@ public class IdentifyData extends HttpServlet {
 		try{
 			initilizeData();
 			PrintWriter out = response.getWriter(); 
-			//@SuppressWarnings("unchecked")
-			//Map<String, String> requestMap = request.getParameterMap();
 			String jsonString="", filePath="" ;
-			//System.out.println(request.toString());
-			/*System.out.println("Content length:" + request.getContentLength());
-			System.out.println("Content query:" + request.getQueryString());
-			System.out.println("Content type:" + request.getContentType());*/
 			String reqFileJSON = request.getParameter("file");
 			String reqStringJSON  = request.getParameter("json");
 			if(reqStringJSON != null) {
@@ -421,7 +422,7 @@ public class IdentifyData extends HttpServlet {
 				jArray = new JSONArray(jsonString);
 			}
 			catch(Exception e) {
-				out.println("Malformed JSON");
+				out.println("{Malformed JSON}");
 				return;
 			}
 
@@ -615,7 +616,10 @@ public class IdentifyData extends HttpServlet {
 						calFrequency(getJSONObjectbyID(jArray,id_list[i]), 2, dataType.values()[maxCounterIndex].toString());
 				}
 			}	
+			try{
 			outputJSON.put("histogram", printHistogram(dataType.values()[maxCounterIndex].toString()));
+			}
+			catch(Exception e) {}
 
 			if (dataType.values()[maxCounterIndex].toString().compareTo("Date") == 0)
 				outputJSON.put("xLabel", dateType);
@@ -627,11 +631,7 @@ public class IdentifyData extends HttpServlet {
 
 			histogramData.clear();
 
-		}catch (JSONException e) {
-			e.printStackTrace();
-
-		}
-		catch (ParseException e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -715,7 +715,6 @@ public class IdentifyData extends HttpServlet {
 			}
 		}
 		catch(Exception e){
-			e.printStackTrace();
 		}
 		// Date Parsing with DATE_FORMAT_ARRAY
 		try{
@@ -787,8 +786,6 @@ public class IdentifyData extends HttpServlet {
 			return;
 		}
 		catch(Exception e){}
-
-
 
 		// Parsing Days of the week
 		try{
