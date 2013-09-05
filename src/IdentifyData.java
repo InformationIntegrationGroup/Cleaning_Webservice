@@ -622,7 +622,8 @@ public class IdentifyData extends HttpServlet {
 			catch(Exception e) {}
 
 			if (dataType.values()[maxCounterIndex].toString().compareTo("Date") == 0)
-				outputJSON.put("xLabel", dateType);
+				
+				outputJSON.put("xLabel", dateType==null?"Date":dateType);
 			else if (dataType.values()[maxCounterIndex].toString().compareTo("DayOfWeek") == 0)
 				outputJSON.put("xLabel", "Weekdays");
 			else
