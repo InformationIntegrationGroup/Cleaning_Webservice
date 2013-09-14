@@ -56,7 +56,7 @@ public class IdentifyData extends HttpServlet {
 		Frequency,
 		IDs
 	};
-	
+
 	public static final int TOTAL_DATATYPES = 7;
 	enum dataType
 	{ 
@@ -120,7 +120,7 @@ public class IdentifyData extends HttpServlet {
 		String currentId = jsonObject.getString("id");
 		String str = null ;
 		if (1 == isValid) {
-			if (datatype == "DayOfWeek" || datatype == "Boolean") { 
+			if (datatype.equalsIgnoreCase("DayOfWeek") || datatype.equalsIgnoreCase("Boolean")) { 
 				str = jsonObject.getString("value").toLowerCase();
 				String firstChar = str.substring(0, 1).toUpperCase();
 				firstChar = firstChar + str.substring(1, str.length());
@@ -134,7 +134,7 @@ public class IdentifyData extends HttpServlet {
 					histogramData.put(str, new Values(currentId, 1));
 				}
 			}
-			if (datatype == "String") { 
+			if (datatype.equalsIgnoreCase("String")) { 
 				str = jsonObject.getString("value").toLowerCase();
 				String firstChar = str.substring(0, 1).toUpperCase();
 				firstChar = firstChar + str.substring(1, str.length());
@@ -148,16 +148,16 @@ public class IdentifyData extends HttpServlet {
 					histogramData.put(str, new Values(currentId, 1));
 				}
 			}
-			if (datatype == "Integer" || datatype == "Double") {
+			if (datatype.equalsIgnoreCase("Integer") || datatype.equalsIgnoreCase("Double") ){
 				int iValue;
 				double fValue;
 				int whichCol = 0 ;
-				if (datatype == "Integer" ) {
+				if (datatype.equalsIgnoreCase("Integer") ) {
 					iValue = Integer.parseInt( jsonObject.getString("value"));
 					whichCol = (int) ((iValue-minIntValue) / colWidth);
 					str = minIntValue  + colWidth * whichCol  +"";
 				}
-				if (datatype == "Double") {
+				if (datatype.equalsIgnoreCase("Double")) {
 					fValue = Double.parseDouble( jsonObject.getString("value"));
 					whichCol = (int) ((fValue-minDoubleValue) / colWidthDouble);
 					float f = (float) (minDoubleValue  + colWidthDouble * whichCol) ;
@@ -174,7 +174,7 @@ public class IdentifyData extends HttpServlet {
 				}
 
 			}
-			if (datatype == "Date" ) { 
+			if (datatype.equalsIgnoreCase("Date") ) { 
 				str = jsonObject.getString("value");
 				Date dateValue = null ;
 				int isDateValid = 0, count = 0;
@@ -265,11 +265,11 @@ public class IdentifyData extends HttpServlet {
 
 		for (int i =0; i< entryList.size(); i++)
 		{
-			if (entryList.get(i).getKey() == "INVALID" )
+			if (entryList.get(i).getKey().equalsIgnoreCase("INVALID"))
 			{
 				ientryInvalid = i;
 			}
-			if (entryList.get(i).getKey() == "MISSING" )
+			if (entryList.get(i).getKey().equalsIgnoreCase("MISSING"))
 			{
 				ientryMissing = i;
 			}
@@ -286,7 +286,7 @@ public class IdentifyData extends HttpServlet {
 		if(ientryMissing!=-1) entryList.remove(entryMissing);
 
 
-		if (datatype == "DayOfWeek") {
+		if (datatype.equalsIgnoreCase("DayOfWeek")) {
 			ArrayList<Entry<String,Values>> weekentryList = 
 					new ArrayList<Entry<String,Values>>(entryList);
 			weekentryList.clear();
@@ -307,29 +307,29 @@ public class IdentifyData extends HttpServlet {
 		Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
 			@SuppressWarnings("deprecation")
 			public int compare(Entry<String, Values> first, Entry<String, Values> second) {
-				if (datatype == "Integer" ) {
+				if (datatype.equalsIgnoreCase("Integer")) {
 					int firstnum = Integer.parseInt(first.getKey());
 					int secnum = Integer.parseInt(second.getKey());
 					return  firstnum - secnum;
 				}
-				if (datatype == "Date") {
+				if (datatype.equalsIgnoreCase("Date")) {
 					long firstnum = Date.parse(first.getKey());
 					long secnum = Date.parse(second.getKey());
 					if(firstnum > secnum) return 1;
 					else return -1;
 				}
-				if (datatype == "Double" ) {
+				if (datatype.equalsIgnoreCase("Double")) {
 					double firstnum = Double.parseDouble(first.getKey());
 					double secnum = Double.parseDouble(second.getKey());
 					if(firstnum > secnum) return 1;
 					else return -1;
 				}
-				if (datatype == "Boolean") {
-					if (first.getKey() == "True")
+				if (datatype.equalsIgnoreCase("Boolean")) {
+					if (first.getKey().equalsIgnoreCase("True"))
 						return -1;
 					else return 1;
 				}
-				if (datatype == "String") {
+				if (datatype.equalsIgnoreCase("String")) {
 					if (first.getValue().counter > second.getValue().counter )
 						return -1;
 					else return 1;
@@ -339,7 +339,7 @@ public class IdentifyData extends HttpServlet {
 		});
 		int restEntries = 0;
 		String restIDs = "";
-		if (datatype == "String") {
+		if (datatype.equalsIgnoreCase("String")) {
 
 			for(int i=MAX_COLUMNS; i < entryList.size(); )
 			{
@@ -520,7 +520,7 @@ public class IdentifyData extends HttpServlet {
 			String validIDs = ids[maxCounterIndex];
 			String [] id_list = validIDs.split(", ");
 
-			if (dataType.values()[maxCounterIndex].toString() == "Integer" )  
+			if (dataType.values()[maxCounterIndex].toString().equalsIgnoreCase("Integer"))  
 			{
 				overallRange = ( maxIntValue - minIntValue);  
 				colWidth =  (long) Math.ceil((float)overallRange /  Math.min( MAX_COLUMNS, id_list.length));
@@ -529,7 +529,7 @@ public class IdentifyData extends HttpServlet {
 				outputJSON.put("histogram_Colwidth", colWidth+"");
 
 			}
-			if (dataType.values()[maxCounterIndex].toString() == "Double" )
+			if (dataType.values()[maxCounterIndex].toString() .equalsIgnoreCase("Double"))
 			{
 				overallRangeDouble = ( maxDoubleValue - minDoubleValue);  
 				colWidthDouble = overallRangeDouble /  Math.min( MAX_COLUMNS, id_list.length);
@@ -538,7 +538,7 @@ public class IdentifyData extends HttpServlet {
 				outputJSON.put("histogram_Colwidth", colWidthDouble+"");
 
 			}
-			if (dataType.values()[maxCounterIndex].toString() == "Date" )  
+			if (dataType.values()[maxCounterIndex].toString().equalsIgnoreCase("Date"))  
 			{
 				DateRange = ( maxDateValue.getTime() - minDateValue.getTime());  
 				colWidth = (long) (DateRange /  Math.min( MAX_COLUMNS/2, id_list.length));
@@ -588,7 +588,7 @@ public class IdentifyData extends HttpServlet {
 			}
 
 			// To fill empty spaces in histogram
-			if (dataType.values()[maxCounterIndex].toString() == "Integer")
+			if (dataType.values()[maxCounterIndex].toString().equalsIgnoreCase("Integer"))
 			{
 				for (int i = 0; (colWidth * i + minIntValue)< maxIntValue ; i++){
 					String str = minIntValue  + colWidth * i  +"";
@@ -617,12 +617,12 @@ public class IdentifyData extends HttpServlet {
 				}
 			}	
 			try{
-			outputJSON.put("histogram", printHistogram(dataType.values()[maxCounterIndex].toString()));
+				outputJSON.put("histogram", printHistogram(dataType.values()[maxCounterIndex].toString()));
 			}
 			catch(Exception e) {}
 
 			if (dataType.values()[maxCounterIndex].toString().compareTo("Date") == 0)
-				
+
 				outputJSON.put("xLabel", dateType==null?"Date":dateType);
 			else if (dataType.values()[maxCounterIndex].toString().compareTo("DayOfWeek") == 0)
 				outputJSON.put("xLabel", "Weekdays");
@@ -686,7 +686,7 @@ public class IdentifyData extends HttpServlet {
 
 	private String removeTrailingCommas(String inputString) {
 
-		if (inputString == null || inputString == "" || inputString.length() <0)
+		if (inputString == null || inputString.equalsIgnoreCase("") || inputString.length() <0)
 			return inputString;
 
 		int lastComma = inputString.lastIndexOf(",");
