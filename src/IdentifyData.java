@@ -305,19 +305,41 @@ public class IdentifyData extends HttpServlet {
 		}
 
 		Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
-			@SuppressWarnings("deprecation")
 			public int compare(Entry<String, Values> first, Entry<String, Values> second) {
 				if (datatype.equalsIgnoreCase("Integer")) {
 					int firstnum = Integer.parseInt(first.getKey());
 					int secnum = Integer.parseInt(second.getKey());
 					return  firstnum - secnum;
 				}
-				if (datatype.equalsIgnoreCase("Date")) {
-					long firstnum = Date.parse(first.getKey());
-					long secnum = Date.parse(second.getKey());
-					if(firstnum > secnum) return 1;
+				/*if (datatype.equalsIgnoreCase("Date")) {
+					int isDateValid = 0, count = 0;
+					Date dateValue = null;
+					while(isDateValid  == 0 && count < DATE_FORMAT_ARRAY.length) {
+						try {
+							SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count++]);
+							tm.setLenient(false);
+							dateValue = tm.parse(first.getKey());
+							isDateValid = 1;
+						}
+						catch(Exception e){}
+					}
+					Date firstnum = dateValue;
+					
+					isDateValid = 0; count = 0;
+					dateValue = null;
+					while(isDateValid  == 0 && count < DATE_FORMAT_ARRAY.length) {
+						try {
+							SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count++]);
+							tm.setLenient(false);
+							dateValue = tm.parse(second.getKey());
+							isDateValid = 1;
+						}
+						catch(Exception e){}
+					}
+					Date secnum = dateValue;
+					if(firstnum.after(secnum)) return 1;
 					else return -1;
-				}
+				}*/
 				if (datatype.equalsIgnoreCase("Double")) {
 					double firstnum = Double.parseDouble(first.getKey());
 					double secnum = Double.parseDouble(second.getKey());
@@ -420,6 +442,7 @@ public class IdentifyData extends HttpServlet {
 			JSONArray jArray = null;
 			try{
 				jArray = new JSONArray(jsonString);
+				//System.out.println(jArray.toString(3));
 			}
 			catch(Exception e) {
 				out.println("{Malformed JSON}");
