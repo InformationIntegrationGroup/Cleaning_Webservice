@@ -32,10 +32,9 @@ public class IdentifyData extends HttpServlet {
 	int sampleRate = 1;
 	int sampleSize = -1;
 	// TO SUPPORT NEW DATE FORMAT, ADD THE PATTERN STRING IN FOLLOWING ARRAY
-	public static final String []DATE_FORMAT_ARRAY = {"dd-MMM-yy", "yyyy.MM.dd G 'at' HH:mm:ss z", "EEE, MMM d, ''yy", "h:mm a", "hh 'o''clock' a, zzzz",
+	public static final String []DATE_FORMAT_ARRAY = { "yyyy-MM-dd HH:mm:ss,z", "yyyy-MM-dd HH:mm:ss.z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ssz", "dd-MMM-yy", "yyyy.MM.dd G 'at' HH:mm:ss z", "EEE, MMM d, ''yy", "h:mm a", "hh 'o''clock' a, zzzz",
 		"K:mm a, z", "yyyyy.MMMMM.dd GGG hh:mm aaa", "EEE, d MMM yyyy HH:mm:ss Z", "dd.MM.yy",
-		"yyyy.MM.dd G 'at' hh:mm:ss z", "EEE d MMM yy", "yyyy-mm-dd", "yyyy/mm/dd", "yyyy-MM-dd HH:mm:ss,z", 
-		"EEE, dd MMM yyyy HH:mm:ss z", "yyyy-MM-dd'T'HH:mm:ssz"};  
+		"yyyy.MM.dd G 'at' hh:mm:ss z", "EEE d MMM yy", "yyyy-mm-dd", "yyyy/mm/dd", "yyyy", "MM/yyyy", "mm/yyyy"};  
 	private static final double PERCENTILE = 0.8;
 	Hashtable<String, Values> histogramData  =  new Hashtable<String, Values>();
 	int maxIntValue , minIntValue;
