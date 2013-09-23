@@ -34,7 +34,7 @@ public class IdentifyData extends HttpServlet {
 	// TO SUPPORT NEW DATE FORMAT, ADD THE PATTERN STRING IN FOLLOWING ARRAY
 	public static final String []DATE_FORMAT_ARRAY = { "yyyy-MM-dd HH:mm:ss,z", "yyyy-MM-dd HH:mm:ss.z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ssz", "dd-MMM-yy", "yyyy.MM.dd G 'at' HH:mm:ss z", "EEE, MMM d, ''yy", "h:mm a", "hh 'o''clock' a, zzzz",
 		"K:mm a, z", "yyyyy.MMMMM.dd GGG hh:mm aaa", "EEE, d MMM yyyy HH:mm:ss Z", "dd.MM.yy",
-		"yyyy.MM.dd G 'at' hh:mm:ss z", "EEE d MMM yy", "yyyy-mm-dd", "yyyy/mm/dd", "yyyy", "MM/yyyy", "mm/yyyy"};  
+		"yyyy.MM.dd G 'at' hh:mm:ss z", "EEE d MMM yy", "yyyy-mm-dd", "yyyy/mm/dd", "MM/yyyy", "mm/yyyy", "yyyy"};  
 	private static final double PERCENTILE = 0.8;
 	Hashtable<String, Values> histogramData  =  new Hashtable<String, Values>();
 	int maxIntValue , minIntValue;
@@ -204,6 +204,9 @@ public class IdentifyData extends HttpServlet {
 				}
 				else
 					str =  new Date((long) (minDateValue.getTime()) + colWidth*whichCol).toString();
+				
+				str =  new SimpleDateFormat("MM-dd-yyyy").format( new Date((long) (minDateValue.getTime()) + colWidth*whichCol));
+				dateType = "Date";
 				if (histogramData.containsKey(str)){
 					((Values)histogramData.get(str)).counter++;
 					((Values)histogramData.get(str)).IDs += ", "+ currentId;
@@ -310,35 +313,24 @@ public class IdentifyData extends HttpServlet {
 					int secnum = Integer.parseInt(second.getKey());
 					return  firstnum - secnum;
 				}
-				/*if (datatype.equalsIgnoreCase("Date")) {
-					int isDateValid = 0, count = 0;
-					Date dateValue = null;
-					while(isDateValid  == 0 && count < DATE_FORMAT_ARRAY.length) {
-						try {
-							SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count++]);
-							tm.setLenient(false);
-							dateValue = tm.parse(first.getKey());
-							isDateValid = 1;
-						}
-						catch(Exception e){}
+				if (datatype.equalsIgnoreCase("Date")) {
+					Date firstDate = null;
+					try {
+						firstDate = new SimpleDateFormat("MM-dd-yyyy").parse(first.getKey());
+					} catch (ParseException e1) {
+						e1.printStackTrace();
 					}
-					Date firstnum = dateValue;
-					
-					isDateValid = 0; count = 0;
-					dateValue = null;
-					while(isDateValid  == 0 && count < DATE_FORMAT_ARRAY.length) {
-						try {
-							SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count++]);
-							tm.setLenient(false);
-							dateValue = tm.parse(second.getKey());
-							isDateValid = 1;
-						}
-						catch(Exception e){}
+					Date secondDate = null;
+					try {
+						secondDate = new SimpleDateFormat("MM-dd-yyyy").parse(second.getKey());
+					} catch (ParseException e) {
+						e.printStackTrace();
 					}
-					Date secnum = dateValue;
-					if(firstnum.after(secnum)) return 1;
+					if(firstDate.after(secondDate)) return 1;
 					else return -1;
-				}*/
+				}
+				
+				
 				if (datatype.equalsIgnoreCase("Double")) {
 					double firstnum = Double.parseDouble(first.getKey());
 					double secnum = Double.parseDouble(second.getKey());
@@ -745,7 +737,13 @@ public class IdentifyData extends HttpServlet {
 			int isDateValid = 0, count = 0;
 			while(isDateValid  == 0 && count < DATE_FORMAT_ARRAY.length) {
 				try {
-					SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count++]);
+					if (DATE_FORMAT_ARRAY[count].endsWith("yyyy") && str.length() !=4)
+					{
+						count++;
+						throw new Exception();
+					}
+					SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count]);
+					count++;
 					tm.setLenient(false);
 					dateValue = tm.parse(str);
 					isDateValid = 1;
