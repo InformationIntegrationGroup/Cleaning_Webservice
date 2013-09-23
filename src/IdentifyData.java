@@ -206,7 +206,9 @@ public class IdentifyData extends HttpServlet {
 					str =  new Date((long) (minDateValue.getTime()) + colWidth*whichCol).toString();
 				
 				str =  new SimpleDateFormat("MM-dd-yyyy").format( new Date((long) (minDateValue.getTime()) + colWidth*whichCol));
+				String strBucketEnd =  new SimpleDateFormat("MM-dd-yyyy").format( new Date((long) (minDateValue.getTime()) + colWidth*(whichCol+1)));
 				dateType = "Date";
+				str = str + "-" + strBucketEnd;
 				if (histogramData.containsKey(str)){
 					((Values)histogramData.get(str)).counter++;
 					((Values)histogramData.get(str)).IDs += ", "+ currentId;
@@ -564,6 +566,16 @@ public class IdentifyData extends HttpServlet {
 
 				if (colWidth==0)
 					colWidth = 1;
+				@SuppressWarnings("deprecation")
+				int months = new Date(colWidth).getMonth();
+				@SuppressWarnings("deprecation")
+				int days = new Date(colWidth).getDate();
+				String dateWidthStr = null;
+				if (months == 0)
+					dateWidthStr = days + " days";
+				else
+					dateWidthStr = "" + months + " months " + days + " days";
+				outputJSON.put("histogram_Colwidth", dateWidthStr);
 			}
 
 			//	Calculate the frequency of Valid IDs
@@ -737,10 +749,20 @@ public class IdentifyData extends HttpServlet {
 			int isDateValid = 0, count = 0;
 			while(isDateValid  == 0 && count < DATE_FORMAT_ARRAY.length) {
 				try {
-					if (DATE_FORMAT_ARRAY[count].endsWith("yyyy") && str.length() !=4)
+					if (DATE_FORMAT_ARRAY[count].equals("yyyy") && str.length() !=4)
 					{
 						count++;
 						throw new Exception();
+					}
+					if (DATE_FORMAT_ARRAY[count].equals("yyyy") )
+					{
+						int i = Integer.parseInt(str);
+						if (i > 2100)
+						{
+							count++;
+							throw new Exception();
+						}
+							
 					}
 					SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count]);
 					count++;
