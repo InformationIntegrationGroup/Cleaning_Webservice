@@ -566,15 +566,20 @@ public class IdentifyData extends HttpServlet {
 
 				if (colWidth==0)
 					colWidth = 1;
+				
+				@SuppressWarnings("deprecation")
+				int years = new Date(colWidth).getYear()-70;
 				@SuppressWarnings("deprecation")
 				int months = new Date(colWidth).getMonth();
 				@SuppressWarnings("deprecation")
 				int days = new Date(colWidth).getDate();
-				String dateWidthStr = null;
+				String dateWidthStr = "";
+				if (years > 0)
+					dateWidthStr = "" + years + " years "; 
 				if (months == 0)
-					dateWidthStr = days + " days";
+					dateWidthStr += days + " days";
 				else
-					dateWidthStr = "" + months + " months " + days + " days";
+					dateWidthStr += "" + months + " months " + days + " days";
 				outputJSON.put("histogram_Colwidth", dateWidthStr);
 			}
 
