@@ -754,23 +754,24 @@ public class IdentifyData extends HttpServlet {
 			int isDateValid = 0, count = 0;
 			while(isDateValid  == 0 && count < DATE_FORMAT_ARRAY.length) {
 				try {
-					if (DATE_FORMAT_ARRAY[count].equals("yyyy") && str.length() !=4)
+					count++;
+					if (DATE_FORMAT_ARRAY[count-1].equals("yyyy") && str.length() !=4)
 					{
-						count++;
+						//count++;
 						throw new Exception();
 					}
-					if (DATE_FORMAT_ARRAY[count].equals("yyyy") )
+					if (DATE_FORMAT_ARRAY[count-1].equals("yyyy") )
 					{
 						int i = Integer.parseInt(str);
 						if (i > 2100)
 						{
-							count++;
+							//count++;
 							throw new Exception();
 						}
-							
+
 					}
-					SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count]);
-					count++;
+					SimpleDateFormat tm = new SimpleDateFormat(DATE_FORMAT_ARRAY[count-1]);
+					//count++;
 					tm.setLenient(false);
 					dateValue = tm.parse(str);
 					isDateValid = 1;
