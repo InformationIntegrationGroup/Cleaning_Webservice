@@ -208,7 +208,7 @@ public class IdentifyData extends HttpServlet {
 				str =  new SimpleDateFormat("MM-dd-yyyy").format( new Date((long) (minDateValue.getTime()) + colWidth*whichCol));
 				String strBucketEnd =  new SimpleDateFormat("MM-dd-yyyy").format( new Date((long) (minDateValue.getTime()) + colWidth*(whichCol+1)));
 				dateType = "Date";
-				str = str + "-" + strBucketEnd;
+				//str = str + "-" + strBucketEnd;
 				if (histogramData.containsKey(str)){
 					((Values)histogramData.get(str)).counter++;
 					((Values)histogramData.get(str)).IDs += ", "+ currentId;
