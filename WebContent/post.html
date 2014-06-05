@@ -1,0 +1,68 @@
+<html>
+
+<head>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+
+function invokeService() {
+	var text = $("#json").val();
+	
+	console.log("Got text:" + text);
+	var json = $.parseJSON(text);
+	var postData = "json=" + JSON.stringify(json);
+
+	/*
+	info["newInfo"] = ;
+
+    showLoading(info["worksheetId"]);
+
+    var returned = $.ajax({
+        url: "RequestController",
+        type: "POST",
+        data : info,
+        dataType : "json",
+        complete :
+            function (xhr, textStatus) {
+                // alert(xhr.responseText);
+                
+                parse(json);
+                hideLoading(info["worksheetId"]);
+            },
+        error :
+            function (xhr, textStatus) {
+                alert("Error occured while removing semantic types!" + textStatus);
+                hideLoading(info["worksheetId"]);
+            }
+    });
+    */
+
+	$.ajax({
+        url: "IdentifyData",
+        type: "POST",
+        data: postData,
+        async: false,
+        complete:
+           function() {
+              console.log("Done");
+              },
+        error:
+           function() {
+              alert("Error");
+           }
+
+       });
+}
+</script>
+
+</head>
+
+<body>
+
+<h1> Invoke Cleaning Service using POST</h1>
+<textarea rows="10" cols="80" id="json">
+[{"id":"N42","value":"Collection descriptions"},{"id":"N44","value":"Photographs"},{"id":"N46","value":"Scrapbooks"},{"id":"N48","value":"Archival materials"},{"id":"N50","value":"Sketches"},{"id":"N70","value":"Drawings"},{"id":"N90","value":"Drawings"},{"id":"N110","value":"Sculpture (visual work)"},{"id":"N130","value":"Photographs"},{"id":"N132","value":"Archival materials"},{"id":"N152","value":"Collection descriptions"},{"id":"N154","value":"Photographs"},{"id":"N156","value":"Archival materials"},{"id":"N176","value":"Collection descriptions"},{"id":"N178","value":"Archival materials"},{"id":"N198","value":"Paintings"},{"id":"N236","value":"Coats (garments)"},{"id":"N256","value":"Paintings"},{"id":"N294","value":"Paintings"},{"id":"N314","value":"Photographs"},{"id":"N316","value":"Archival materials"},{"id":"N336","value":"Paintings"},{"id":"N356","value":"Coats (garments)"},{"id":"N376","value":"Coats (garments)"},{"id":"N396","value":"Chairs (furniture forms)"},{"id":"N416","value":"Photographs"},{"id":"N436","value":"Photographs"},{"id":"N456","value":"Collecting cards"},{"id":"N458","value":"Engravings (prints)"},{"id":"N460","value":"Archival materials"},{"id":"N480","value":"Outdoor sculpture"},{"id":"N482","value":"Sculpture (visual work)"},{"id":"N502","value":"Sculpture (visual work)"},{"id":"N522","value":"Sculpture (visual work)"},{"id":"N542","value":"Sculpture (visual work)"},{"id":"N562","value":"Sculpture (visual work)"},{"id":"N582","value":"Flags"},{"id":"N602","value":"Keys (hardware)"},{"id":"N622","value":"Texts"},{"id":"N624","value":"Microforms"},{"id":"N626","value":"Biographies"},{"id":"N650","value":"Dictionaries"},{"id":"N672","value":"Dictionaries"},{"id":"N692","value":"Archival materials"},{"id":"N716","value":"Music"},{"id":"N718","value":"Archival materials"},{"id":"N720","value":"Sound recordings"},{"id":"N744","value":"Music"},{"id":"N746","value":"Archival materials"},{"id":"N748","value":"Sound recordings"},{"id":"N770","value":"Texts"},{"id":"N794","value":"Music"},{"id":"N796","value":"Archival materials"},{"id":"N798","value":"Sound recordings"},{"id":"N822","value":"Vocabularies"},{"id":"N824","value":"Glossaries"},{"id":"N842","value":"Archival materials"},{"id":"N860","value":"Archival materials"},{"id":"N878","value":"Prints"},{"id":"N896","value":"Prints"},{"id":"N914","value":"Prints"},{"id":"N932","value":"Sculpture (visual work)"},{"id":"N952","value":"Books"},{"id":"N954","value":"Exhibitions (events)"},{"id":"N972","value":"Drawings"},{"id":"N990","value":"Photographs"},{"id":"N1008","value":"Postage stamps"},{"id":"N1026","value":"Photographs"},{"id":"N1044","value":"Photographs"},{"id":"N1062","value":"Sculpture (visual work)"},{"id":"N1080","value":"Photographs"},{"id":"N1098","value":"Prints"},{"id":"N1116","value":"Photographs"},{"id":"N1134","value":"Prints"},{"id":"N1152","value":"Paintings"},{"id":"N1170","value":"Paintings"},{"id":"N1188","value":"Outdoor sculpture"},{"id":"N1190","value":"Sculpture (visual work)"},{"id":"N1192","value":"Architectural elements"},{"id":"N1194","value":"Reliefs (sculptures)"},{"id":"N1212","value":"Paintings"},{"id":"N1230","value":"Photographs"},{"id":"N1232","value":"People"},{"id":"N1250","value":"Collection descriptions"},{"id":"N1252","value":"Photographs"},{"id":"N1254","value":"Archival materials"},{"id":"N1274","value":"Electronic information resources"},{"id":"N1292","value":"Smithsonian staff publications"},{"id":"N1294","value":"Electronic documents"},{"id":"N1312","value":"Diaries"},{"id":"N1314","value":"Field notes"},{"id":"N1380","value":"Photographs"},{"id":"N1382","value":"People"},{"id":"N1400","value":"Photographs"},{"id":"N1418","value":"Postage stamps"},{"id":"N1438","value":"Biographies"},{"id":"N1456","value":"Newspapers"},{"id":"N1458","value":"Collection descriptions"},{"id":"N1460","value":"Photographs"},{"id":"N1462","value":"Woodcuts (prints)"},{"id":"N1464","value":"Archival materials"},{"id":"N1530","value":"Books"},{"id":"N1532","value":"Paintings"},{"id":"N1550","value":"Photographs"},{"id":"N1568","value":"Collection descriptions"},{"id":"N1570","value":"Photographs"},{"id":"N1572","value":"Archival materials"},{"id":"N1574","value":"Drawings"},{"id":"N1592","value":"Photographs"},{"id":"N1594","value":"Archival materials"},{"id":"N1628","value":"Graters"}]
+</textarea>
+
+<Br/>
+<input type="button" value="Invoke Service" onclick="javascript:invokeService();" />
+</body>

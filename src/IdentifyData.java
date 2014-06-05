@@ -49,7 +49,7 @@ public class IdentifyData extends HttpServlet {
 	private double minDoubleValue;
 	private double colWidthDouble;
 	private String dateType;
-
+	
 	enum jsonkeys {
 		Value,
 		Frequency,
@@ -308,14 +308,22 @@ public class IdentifyData extends HttpServlet {
 			entryList = new ArrayList<Entry<String,Values>>(weekentryList);
 		}
 
-		Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
-			public int compare(Entry<String, Values> first, Entry<String, Values> second) {
-				if (datatype.equalsIgnoreCase("Integer")) {
+		if (datatype.equalsIgnoreCase("Integer")) {
+			Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
+				public int compare(Entry<String, Values> first, Entry<String, Values> second) {
+				
 					int firstnum = Integer.parseInt(first.getKey());
 					int secnum = Integer.parseInt(second.getKey());
 					return  firstnum - secnum;
 				}
-				if (datatype.equalsIgnoreCase("Date")) {
+				
+			});
+		}
+		
+		if (datatype.equalsIgnoreCase("Date")) {
+			Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
+				public int compare(Entry<String, Values> first, Entry<String, Values> second) {
+				
 					Date firstDate = null;
 					try {
 						firstDate = new SimpleDateFormat("MM-dd-yyyy").parse(first.getKey());
@@ -332,26 +340,42 @@ public class IdentifyData extends HttpServlet {
 					else return -1;
 				}
 				
+			});
+		}
+		
+		if (datatype.equalsIgnoreCase("Double")) {
+			Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
+				public int compare(Entry<String, Values> first, Entry<String, Values> second) {
 				
-				if (datatype.equalsIgnoreCase("Double")) {
 					double firstnum = Double.parseDouble(first.getKey());
 					double secnum = Double.parseDouble(second.getKey());
-					if(firstnum > secnum) return 1;
+					if(firstnum >= secnum) return 1;
 					else return -1;
 				}
-				if (datatype.equalsIgnoreCase("Boolean")) {
+				
+			});
+		}
+		
+		if (datatype.equalsIgnoreCase("Boolean")) {
+			Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
+				public int compare(Entry<String, Values> first, Entry<String, Values> second) {
 					if (first.getKey().equalsIgnoreCase("True"))
 						return -1;
 					else return 1;
 				}
-				if (datatype.equalsIgnoreCase("String")) {
-					if (first.getValue().counter > second.getValue().counter )
-						return -1;
-					else return 1;
+				
+			});
+		}
+		
+		if (datatype.equalsIgnoreCase("String")) {
+			Collections.sort(entryList, new Comparator<Entry<String,Values>>() {
+				public int compare(Entry<String, Values> first, Entry<String, Values> second) {
+					return second.getValue().counter - first.getValue().counter;
 				}
-				return 0;
-			}
-		});
+				
+			});
+		}
+		
 		int restEntries = 0;
 		String restIDs = "";
 		if (datatype.equalsIgnoreCase("String")) {
@@ -401,6 +425,7 @@ public class IdentifyData extends HttpServlet {
 		return output;
 	}
 
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
 
 		try{
@@ -409,6 +434,7 @@ public class IdentifyData extends HttpServlet {
 			String jsonString="", filePath="" ;
 			String reqFileJSON = request.getParameter("file");
 			String reqStringJSON  = request.getParameter("json");
+			
 			if(reqStringJSON != null) {
 				jsonString = request.getParameter("json");
 			}
@@ -650,7 +676,9 @@ public class IdentifyData extends HttpServlet {
 			try{
 				outputJSON.put("histogram", printHistogram(dataType.values()[maxCounterIndex].toString()));
 			}
-			catch(Exception e) {}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
 
 			if (dataType.values()[maxCounterIndex].toString().compareTo("Date") == 0)
 
