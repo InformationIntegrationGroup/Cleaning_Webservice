@@ -512,8 +512,10 @@ public class IdentifyData extends HttpServlet {
 			{
 				if(counters[i]>maxCounterValue) 
 				{
-					maxCounterIndex = i;
-					maxCounterValue = counters[i];
+					if(maxCounterValue == 0 || i!=TOTAL_DATATYPES-1) { //Ignore EMpty String DT
+						maxCounterIndex = i;
+						maxCounterValue = counters[i];
+					}
 				}
 				TotalCounterValues += counters[i];
 			}
